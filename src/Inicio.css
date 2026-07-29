@@ -47,15 +47,41 @@ body {
     justify-content: center;
     align-items: center;
 }
-.cuenta-card h1::after{
-    content:"";
-    display:block;
-    width:80px;
-    height:3px;
-    margin:15px auto 0;
-    background:#d4af37;
-    border-radius:10px;
+
+.cuenta-card h1::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 3px;
+    margin: 15px auto 0;
+    background: #d4af37;
+    border-radius: 10px;
 }
+
+.empty-state {
+    width: 100%;
+    min-height: 50vh;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+}
+
+.empty-state h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #111;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    color: #777;
+}
+
 
 .productos-toolbar input {
     flex: 1;

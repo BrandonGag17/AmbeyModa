@@ -57,6 +57,7 @@ function Inicio() {
 
     return (
         <div className="inicio-page">
+
             <section className="inicio-hero">
                 <div className="inicio-header">
                     <h1>AMBEY MODA</h1>
@@ -69,40 +70,82 @@ function Inicio() {
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                 />
+
                 {esAdmin && (
-                    <button className="btn btn-primary" onClick={crearProducto}>
+                    <button
+                        className="btn btn-primary"
+                        onClick={crearProducto}
+                    >
                         Crear producto
                     </button>
                 )}
             </div>
 
             {loading ? (
+
                 <div className="loading-state">
                     <div className="spinner" />
                     <p>Cargando productos...</p>
                 </div>
+
+            ) : productos.length === 0 ? (
+
+                <div className="empty-state">
+                    <h2>Todavía no hay productos</h2>
+
+                   
+                </div>
+
+            ) : productosFiltrados.length === 0 ? (
+
+                <div className="empty-state">
+                    <h2>No encontramos ese producto</h2>
+                    <p>Probá con otro nombre.</p>
+                </div>
+
             ) : (
+
                 <div className="productos-grid">
-                    {productosFiltrados.map((prod, index) => (
+
+                    {productosFiltrados.map((prod) => (
+
                         <button
                             className="producto-card"
-                            key={index}
+                            key={prod.idProducto}
                             onClick={() => navigate(`/producto/${prod.idProducto}`)}
                         >
+
                             <div className="producto-card__image">
-                                {prod.ImagenUrl && <img src={prod.ImagenUrl} alt={prod.Nombre} />}
+                                {prod.ImagenUrl && (
+                                    <img
+                                        src={prod.ImagenUrl}
+                                        alt={prod.Nombre}
+                                    />
+                                )}
                             </div>
+
                             <div className="producto-card__body">
+
                                 <h3>{prod.Nombre}</h3>
-                                <p className="producto-card__subtitle">{prod.Descripcion || prod.Categoria || 'Accesorio de moda'}</p>
+
+                                <p className="producto-card__subtitle">
+                                    {prod.Descripcion || prod.Categoria || "Accesorio de moda"}
+                                </p>
+
                                 <div className="producto-card__meta">
                                     <span>{formatearPrecio(prod.Precio)}</span>
                                 </div>
+
                             </div>
+
                         </button>
+
                     ))}
+
                 </div>
+
             )}
+
         </div>
     )
 }
