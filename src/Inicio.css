@@ -41,14 +41,20 @@ body {
 .productos-toolbar {
     display: flex;
     gap: 20px;
-
     width: 100%;
     max-width: 800px;
-
     margin: 0 auto 45px;
-
     justify-content: center;
     align-items: center;
+}
+.cuenta-card h1::after{
+    content:"";
+    display:block;
+    width:80px;
+    height:3px;
+    margin:15px auto 0;
+    background:#d4af37;
+    border-radius:10px;
 }
 
 .productos-toolbar input {
