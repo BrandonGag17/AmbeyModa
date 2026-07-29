@@ -1,7 +1,26 @@
-import AppRouter from "./router/AppRouter";
+import { Routes, Route } from 'react-router-dom'
+import Inicio from './Inicio'
+import Cuenta from './Cuenta'
+import CrearProducto from './CrearProducto'
+import Navbar from './Navbar'
 
-function App() {
-  return <AppRouter />;
+function Header() {
+  return (
+    <Navbar />
+  )
 }
 
-export default App;
+function App() {
+  return (
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/cuenta" element={<Cuenta />} />
+        <Route path="/crear-producto" element={<CrearProducto />} />
+      </Routes>
+    </>
+  )
+}
+
+export default App
