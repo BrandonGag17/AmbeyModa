@@ -8,7 +8,6 @@ function CrearProducto() {
 
   const [Nombre, setNombre] = useState('')
   const [Descripcion, setDescripcion] = useState('')
-  const [Precio, setPrecio] = useState('')
   const [Categoria, setCategoria] = useState('')
   const [ImagenUrl, setImagenUrl] = useState('')
   const [ImagenFile, setImagenFile] = useState(null)
@@ -27,10 +26,6 @@ function CrearProducto() {
     return () => URL.revokeObjectURL(objectUrl)
   }, [ImagenFile])
 
-  const convertirPrecio = (precio) => {
-    if (!precio) return 0
-    return Number(precio.toString().replace(',', '.'))
-  }
 
   const convertirArchivoABase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -58,7 +53,7 @@ function CrearProducto() {
   const manejarSubmit = async (e) => {
     e.preventDefault()
 
-    if (!Nombre || !Descripcion || !Precio || !Categoria) {
+    if (!Nombre || !Descripcion || !Categoria) {
       alert('Completa todos los campos antes de enviar.')
       return
     }
@@ -86,7 +81,6 @@ function CrearProducto() {
     const producto = {
       Nombre,
       Descripcion,
-      Precio: convertirPrecio(Precio),
       Categoria,
       ImagenUrl: imagenFinal
     }
@@ -135,15 +129,7 @@ function CrearProducto() {
           />
         </div>
 
-        <div className="form-campo">
-          <label>Precio</label>
-          <input
-            type="text"
-            placeholder="$0"
-            value={Precio}
-            onChange={(e) => setPrecio(e.target.value)}
-          />
-        </div>
+        
 
         <div className="form-campo">
           <label>Categoría</label>

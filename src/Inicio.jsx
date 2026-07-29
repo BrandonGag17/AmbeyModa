@@ -48,7 +48,7 @@ function Inicio() {
 
     const formatearPrecio = (precio) => {
         const valor = Number(precio)
-        if (Number.isNaN(valor)) return 'ARS 0,00'
+        if (Number.isNaN(valor)) return 'ARS 0,00'
         return valor.toLocaleString('es-AR', {
             style: 'currency',
             currency: 'ARS'
@@ -93,7 +93,7 @@ function Inicio() {
                 <div className="empty-state">
                     <h2>Todavía no hay productos</h2>
 
-                   
+
                 </div>
 
             ) : productosFiltrados.length === 0 ? (
@@ -112,7 +112,7 @@ function Inicio() {
                         <button
                             className="producto-card"
                             key={prod.idProducto}
-                            onClick={() => navigate(`/producto/${prod.idProducto}`)}
+                            onClick={() => navigate(`/detalle-producto/${prod.idProducto}`)}
                         >
 
                             <div className="producto-card__image">
@@ -148,6 +148,8 @@ function Inicio() {
 
         </div>
     )
+
+
 }
 
 export default Inicio
