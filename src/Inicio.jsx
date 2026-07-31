@@ -129,12 +129,8 @@ function Inicio() {
                                 <h3>{prod.Nombre}</h3>
 
                                 <p className="producto-card__subtitle">
-                                    {prod.Descripcion || prod.Categoria || "Accesorio de moda"}
+                                    {prod.Descripcion || "Accesorio de moda"}
                                 </p>
-
-                                <div className="producto-card__meta">
-                                    <span>{formatearPrecio(prod.Precio)}</span>
-                                </div>
 
                             </div>
 

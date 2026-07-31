@@ -12,11 +12,27 @@ function DetalleProducto() {
   const [form, setForm] = useState(null)
   const [imagenFile, setImagenFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState('')
+  const [categorias, setCategorias] = useState([])
 
   useEffect(() => {
+    traerCategorias()
     traerProducto()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  async function traerCategorias() {
+    const { data, error } = await supabase
+      .from('categorias')
+      .select('idcategoria, nombre')
+      .order('nombre', { ascending: true })
+
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    setCategorias(data || [])
+  }
 
   async function traerProducto() {
     const { data, error } = await supabase
@@ -30,9 +46,21 @@ function DetalleProducto() {
     }
 
     const p = data[0]
-    setProducto(p)
-    setForm({ ...p })
-    setPreviewUrl(p?.ImagenUrl || '')
+
+    const { data: categoria } = await supabase
+      .from('categorias')
+      .select('nombre')
+      .eq('idcategoria', p.idCategoria)
+      .single()
+
+    const productoCompleto = {
+      ...p,
+      categoriaNombre: categoria?.nombre
+    }
+
+    setProducto(productoCompleto)
+    setForm(productoCompleto)
+    setPreviewUrl(productoCompleto.ImagenUrl || '')
   }
 
   const convertirArchivoABase64 = (file) => {
@@ -64,8 +92,8 @@ function DetalleProducto() {
       .update({
         Nombre: form.Nombre,
         Descripcion: form.Descripcion,
-        Categoria: form.Categoria,
-        ImagenUrl: form.ImagenUrl
+        ImagenUrl: form.ImagenUrl,
+        idCategoria: form.idCategoria,
       })
       .eq('idProducto', id)
 
@@ -151,7 +179,6 @@ function DetalleProducto() {
 
           </div>
 
-
           <div className="campo-fila">
             <span className="campo-label">Descripción</span>
 
@@ -168,122 +195,155 @@ function DetalleProducto() {
                 {producto.Descripcion}
               </p>
             )}
-
           </div>
-
-
           <div className="campo-fila">
             <span className="campo-label">Categoría</span>
-
             {editando ? (
-              <input
+              <select
                 className="campo-input"
-                value={form.Categoria}
+                value={form.idCategoria}
                 onChange={(e) =>
-                  setForm({ ...form, Categoria: e.target.value })
+                  setForm({
+                    ...form,
+                    idCategoria: Number(e.target.value)
+                  })
                 }
-              />
+              >
+                <option value="">Seleccionar categoría</option>
+                {categorias.map((categoria) => (
+                  <option
+                    key={categoria.idcategoria}
+                    value={categoria.idcategoria}
+                  >
+                    {categoria.nombre}
+                  </option>
+                ))}
+              </select>
             ) : (
               <p className="campo-valor">
-                {producto.Categoria}
+                {producto.categoriaNombre || 'Sin categoría'}
               </p>
             )}
 
           </div>
+          <div className="campo-fila">
+            <span className="campo-label">En stock</span>
+
+            {editando ? (
+              <select
+                className="campo-input"
+                value={form.enStock ? "true" : "false"}
+                onChange={(e) =>
+                  setForm({
+                    ...form, enStock: e.target.value === "true"
+                  })
+                }
+              >
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            ) : (
+              <p className="campo-valor">
+                {producto.enStock ? "Sí ✅" : "No ❌"}
+              </p>
+            )}
 
 
-          {editando && (
+            {editando && (
 
-            <div className="campo-fila">
+              <div className="campo-fila">
 
-              <span className="campo-label">
-                Cambiar imagen
-              </span>
-
-
-              <div className="imagen-editor">
-
-                <input
-                  className="input-file"
-                  type="file"
-                  accept="image/*"
-                  onChange={manejarArchivo}
-                />
+                <span className="campo-label">
+                  Cambiar imagen
+                </span>
 
 
-                <input
-                  className="campo-input"
-                  placeholder="O pegá una URL"
-                  value={form.ImagenUrl || ''}
-                  onChange={(e) => {
-                    setForm({
-                      ...form,
-                      ImagenUrl: e.target.value
-                    })
-                    setPreviewUrl(e.target.value)
-                  }}
-                />
+                <div className="imagen-editor">
 
-
-                {previewUrl && (
-                  <img
-                    className="imagen-preview"
-                    src={previewUrl}
-                    alt="Vista previa"
+                  <input
+                    className="input-file"
+                    type="file"
+                    accept="image/*"
+                    onChange={manejarArchivo}
                   />
-                )}
+
+
+                  <input
+                    className="campo-input"
+                    placeholder="O pegá una URL"
+                    value={form.ImagenUrl || ''}
+                    onChange={(e) => {
+                      setForm({
+                        ...form,
+                        ImagenUrl: e.target.value
+                      })
+                      setPreviewUrl(e.target.value)
+                    }}
+                  />
+
+
+                  {previewUrl && (
+                    <img
+                      className="imagen-preview"
+                      src={previewUrl}
+                      alt="Vista previa"
+                    />
+                  )}
+
+                </div>
 
               </div>
 
-            </div>
+            )}
 
+          </div>
+
+        </div>
+
+
+        <div className="detalle-producto-acciones">
+
+          {editando ? (
+            <>
+              <button
+                className="btn btn-primary"
+                onClick={guardarCambios}
+              >
+                Guardar
+              </button>
+
+              <button
+                className="btn btn-secondary"
+                onClick={() => setEditando(false)}
+              >
+                Cancelar
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setEditando(true)}
+              >
+                Editar
+              </button>
+
+              <button
+                className="btn btn-danger"
+                onClick={eliminarProducto}
+              >
+                Eliminar
+              </button>
+            </>
           )}
 
         </div>
 
       </div>
 
-
-      <div className="detalle-producto-acciones">
-
-        {editando ? (
-          <>
-            <button
-              className="btn btn-primary"
-              onClick={guardarCambios}
-            >
-              Guardar
-            </button>
-
-            <button
-              className="btn btn-secondary"
-              onClick={() => setEditando(false)}
-            >
-              Cancelar
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setEditando(true)}
-            >
-              Editar
-            </button>
-
-            <button
-              className="btn btn-danger"
-              onClick={eliminarProducto}
-            >
-              Eliminar
-            </button>
-          </>
-        )}
-
-      </div>
-
     </div>
   )
 }
+
 
 export default DetalleProducto

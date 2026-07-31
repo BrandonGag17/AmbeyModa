@@ -1,14 +1,23 @@
 .navbar {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 20px 0;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 5px 100px;
+  background-color: #000000;
   position: sticky;
   top: 0;
   z-index: 20;
 }
+
+
+.navbar__logo {
+  width: 7%;
+  height: auto;
+  object-fit: contain;
+  margin-right: auto;
+}
+
 
 .navbar__link {
   display: inline-flex;
@@ -17,26 +26,125 @@
   min-width: 110px;
   padding: 10px 24px;
   border-radius: 999px;
-  background: rgba(47, 33, 18, 0.12);
-  color: #2f2211;
+  background-color: #eec24a;
+  color: #fffdfb;
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.02em;
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
+
 .navbar__link:hover {
-  background: rgba(47, 33, 18, 0.2);
-  transform: translateY(-1px);
+  background-color: #d9ad35;
+  transform: translateY(-2px);
 }
 
+
+/* Aviso de redes */
+
+.avisos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 20px;
+
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #fffff3;
+  font-size: 15px;
+  font-weight: 600;
+
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  z-index: 19;
+
+  border-top: 1px solid rgba(10, 10, 10, 0.15);
+}
+
+.avisos {
+  animation: aparecerAviso 0.5s ease;
+}
+
+@keyframes aparecerAviso {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.avisos__texto {
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+
+.avisos__icono {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  transition: transform 0.2s ease;
+}
+
+
+.avisos__icono:hover {
+  transform: scale(1.15);
+}
+
+
+/* Responsive */
+
 @media (max-width: 720px) {
+
   .navbar {
     gap: 12px;
-    padding: 14px 0;
+    padding: 15px 30px;
+    flex-wrap: wrap;
+  }
+
+  .navbar__logo {
+    width: 45px;
+    height: 45px;
+    margin-right: 5px;
   }
 
   .navbar__link {
+    min-width: 90px;
     padding: 10px 16px;
+  }
+
+  .avisos {
+    flex-wrap: wrap;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .avisos__texto {
+    font-size: 14px;
+  }
+
+  .avisos__icono {
+    width: 22px;
+    height: 22px;
+  }
+
+  .navbar__logo {
+    width: 25%;
+    height: auto;
+    object-fit: contain;
+    margin-right: auto;
   }
 }
