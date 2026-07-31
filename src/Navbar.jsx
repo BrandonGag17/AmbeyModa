@@ -6,7 +6,15 @@ function Navbar() {
   return (
     <>
       <nav className="navbar">
-        <img src={logo} alt="Ambey" className="navbar__logo" />
+        <img
+          src="/ambey.jpg"
+          onError={(e) => {
+            e.currentTarget.onerror = null
+            e.currentTarget.src = logo
+          }}
+          alt="Ambey"
+          className="navbar__logo"
+        />
         <Link to="/" className="navbar__link">
           Inicio
         </Link>
