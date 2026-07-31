@@ -6,21 +6,40 @@ import './Inicio.css'
 function Inicio() {
     const [productos, setProductos] = useState([])
     const [loading, setLoading] = useState(true)
+    const [categorias, setCategorias] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const navigate = useNavigate()
     const [busqueda, setBusqueda] = useState('')
 
     useEffect(() => {
         cargarProductos()
+        traerCategorias()
     }, [])
 
-    async function cargarProductos() {
-        setLoading(true)
+    async function traerCategorias() {
         const { data, error } = await supabase
-            .from('Productos')
-            .select('*')
+            .from('categorias')
+            .select('idcategoria, nombre')
+            .order('nombre', { ascending: true })
+
+        if (error) {
+            console.error('Error cargando categorías', error)
+            return
+        }
+
+        setCategorias(data || [])
+    }
+
+    async function cargarProductos(categoriaId = null) {
+        setLoading(true)
+        let query = supabase.from('Productos').select('*')
+        if (categoriaId) query = query.eq('idCategoria', Number(categoriaId))
+
+        const { data, error } = await query
 
         if (error) {
             setLoading(false)
+            console.error('Error cargando productos', error)
             return
         }
         setProductos(data)
@@ -79,6 +98,25 @@ function Inicio() {
                         Crear producto
                     </button>
                 )}
+            </div>
+
+            {/* Botones de categorías */}
+            <div className="categorias-bar">
+                <button
+                    className={`btn-categoria ${selectedCategory === null ? 'active' : ''}`}
+                    onClick={() => { setSelectedCategory(null); cargarProductos(); }}
+                >
+                    Todos
+                </button>
+                {categorias.map((cat) => (
+                    <button
+                        key={cat.idcategoria}
+                        className={`btn-categoria ${selectedCategory === cat.idcategoria ? 'active' : ''}`}
+                        onClick={() => { setSelectedCategory(cat.idcategoria); cargarProductos(cat.idcategoria); }}
+                    >
+                        {cat.nombre}
+                    </button>
+                ))}
             </div>
 
             {loading ? (

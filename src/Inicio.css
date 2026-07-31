@@ -10,12 +10,20 @@ body {
     color: #1d1d1d;
 }
 
+/* =========================
+   PAGINA
+========================= */
+
 .inicio-page {
     width: 100%;
     max-width: 1900px;
     margin: auto;
     padding: 40px 30px;
 }
+
+/* =========================
+   HEADER
+========================= */
 
 .inicio-header {
     text-align: center;
@@ -27,7 +35,7 @@ body {
     font-size: 3.5rem;
     color: #111;
     letter-spacing: 6px;
-    margin-bottom: 5%;
+    margin-bottom: 20px;
 }
 
 .inicio-header p {
@@ -38,36 +46,177 @@ body {
     text-transform: uppercase;
 }
 
+/* =========================
+   BUSCADOR
+========================= */
+
 .productos-toolbar {
     display: flex;
-    gap: 20px;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto 45px;
-    justify-content: center;
     align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 30px;
 }
 
-.cuenta-card h1::after {
-    content: "";
-    display: block;
-    width: 80px;
-    height: 3px;
-    margin: 15px auto 0;
-    background: #d4af37;
-    border-radius: 10px;
+.productos-toolbar input {
+    flex: 1;
+    min-width: 300px;
+    height: 50px;
+    padding: 0 20px;
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    background: white;
+    color: #111;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
 }
+
+.productos-toolbar input::placeholder {
+    color: #999;
+}
+
+.productos-toolbar input:focus {
+    outline: none;
+    border-color: #111;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, .15);
+}
+
+.productos-toolbar button {
+    width: auto;
+    flex: 0 0 auto;
+    height: 50px;
+    min-width: 150px;
+    max-width: 180px;
+    padding: 0 20px;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    transition: .25s;
+}
+
+.productos-toolbar button:hover {
+    background: #d4af37;
+    color: #111;
+    transform: translateY(-2px);
+}
+
+/* =========================
+   CATEGORIAS
+========================= */
+
+.categorias-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0 auto 40px;
+}
+
+.btn-categoria {
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: 2px solid #d4af37;
+    background: white;
+    color: #111;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.btn-categoria:hover {
+    background: #111;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-categoria.active {
+    background: #111;
+    color: white;
+    border-color: #111;
+}
+
+.btn-categoria.active:hover {
+    background: #d4af37;
+    color: #111;
+}
+
+/* =========================
+   PRODUCTOS
+========================= */
+
+.productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
+}
+
+.producto-card {
+    border: none;
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    transition: .25s;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .08);
+}
+
+.producto-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 35px rgba(0, 0, 0, .18);
+}
+
+.producto-card__image {
+    aspect-ratio: 1 / 1;
+    background: #ececec;
+}
+
+.producto-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.producto-card__body {
+    padding: 18px;
+}
+
+.producto-card__body h3 {
+    font-size: 20px;
+    color: #111;
+    margin-bottom: 10px;
+}
+
+.producto-card__subtitle {
+    display: none;
+}
+
+.producto-card__meta {
+    color: #d4af37;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* =========================
+   ESTADO VACIO
+========================= */
 
 .empty-state {
     width: 100%;
     min-height: 50vh;
-
     display: flex;
     flex-direction: column;
-
     justify-content: center;
     align-items: center;
-
     text-align: center;
 }
 
@@ -82,41 +231,9 @@ body {
     color: #777;
 }
 
-
-.productos-toolbar input {
-    flex: 1;
-    padding: 15px 22px;
-    border: 2px solid #d4af37;
-    border-radius: 12px;
-    background: white;
-    font-size: 16px;
-}
-
-.productos-toolbar input:focus {
-    outline: none;
-    border-color: #111;
-}
-
-.productos-toolbar button {
-    background: #111;
-    color: white;
-    border: none;
-    padding: 15px 24px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: .25s;
-}
-
-.productos-toolbar button:hover {
-    background: #d4af37;
-    color: #111;
-}
-
-.productos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 30px;
-}
+/* =========================
+   LOADING
+========================= */
 
 .loading-state {
     display: flex;
@@ -133,7 +250,7 @@ body {
 .spinner {
     width: 54px;
     height: 54px;
-    border: 6px solid rgba(47, 33, 18, 0.18);
+    border: 6px solid rgba(47, 33, 18, .18);
     border-top-color: #2f2211;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -145,93 +262,26 @@ body {
     }
 }
 
-.producto-card {
-
-    border: none;
-    background: white;
-
-    border-radius: 18px;
-
-    overflow: hidden;
-
-    cursor: pointer;
-
-    transition: .25s;
-
-    padding: 0;
-
-    box-shadow: 0 8px 18px rgba(0, 0, 0, .08);
-
-}
-
-.producto-card:hover {
-
-    transform: translateY(-6px);
-
-    box-shadow: 0 18px 35px rgba(0, 0, 0, .18);
-
-}
-
-.producto-card__image {
-
-    aspect-ratio: 1/1;
-
-    background: #ececec;
-
-}
-
-.producto-card__image img {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-
-}
-
-.producto-card__body {
-
-    padding: 18px;
-
-}
-
-.producto-card__body h3 {
-
-    font-size: 20px;
-    color: #111;
-    margin-bottom: 10px;
-
-}
-
-.producto-card__subtitle {
-
-    display: none;
-
-}
-
-.producto-card__meta {
-
-    color: #d4af37;
-
-    font-size: 22px;
-
-    font-weight: 700;
-
-}
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media(max-width:700px) {
-
-    .productos-toolbar {
-
-        flex-direction: column;
-
+    .inicio-page {
+        padding: 30px 15px;
     }
 
     .inicio-header h1 {
-
         font-size: 2.5rem;
-
     }
 
+    .productos-toolbar {
+        flex-direction: column;
+    }
+
+    .productos-toolbar input,
+    .productos-toolbar button {
+        width: 100%;
+        max-width: none;
+    }
 }
