@@ -214,7 +214,7 @@ function CrearProducto() {
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => setMostrarNuevaCategoria(!mostrarNuevaCategoria)}
+            onClick={() => setMostrarNuevaCategoria(true)}
           >
             + Nueva categoría
           </button>

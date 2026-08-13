@@ -104,18 +104,39 @@ function Inicio() {
             <div className="categorias-bar">
                 <button
                     className={`btn-categoria ${selectedCategory === null ? 'active' : ''}`}
-                    onClick={() => { setSelectedCategory(null); cargarProductos(); }}
+                    onClick={() => {
+                        setSelectedCategory(null)
+                        cargarProductos()
+                    }}
                 >
                     Todos
                 </button>
+
                 {categorias.map((cat) => (
-                    <button
-                        key={cat.idcategoria}
-                        className={`btn-categoria ${selectedCategory === cat.idcategoria ? 'active' : ''}`}
-                        onClick={() => { setSelectedCategory(cat.idcategoria); cargarProductos(cat.idcategoria); }}
-                    >
-                        {cat.nombre}
-                    </button>
+                    <div className="categoria-item" key={cat.idcategoria}>
+                        <button
+                            className={`btn-categoria ${selectedCategory === cat.idcategoria ? 'active' : ''}`}
+                            onClick={() => {
+                                setSelectedCategory(cat.idcategoria)
+                                cargarProductos(cat.idcategoria)
+                            }}
+                        >
+                            {cat.nombre}
+                        </button>
+
+                        {esAdmin && (
+                            <button
+                                className="btn-editar-categoria"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    navigate(`/editarCategoria/${cat.idcategoria}`)
+                                }}
+                                title="Editar categoría"
+                            >
+                                ✎
+                            </button>
+                        )}
+                    </div>
                 ))}
             </div>
 

@@ -262,6 +262,27 @@ body {
     }
 }
 
+.categoria-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-editar-categoria {
+    border: none;
+    background: transparent;
+    font-size: 17px;
+    cursor: pointer;
+    color: #b08d57;
+    padding: 4px;
+    transition: 0.2s;
+}
+
+.btn-editar-categoria:hover {
+    transform: scale(1.15);
+    color: #8f713f;
+}
+
 /* =========================
    RESPONSIVE
 ========================= */

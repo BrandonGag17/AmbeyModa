@@ -1,0 +1,136 @@
+.editar-categoria-nombre {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 28px;
+    background: #fff;
+    border-radius: 18px;
+    border-top: 5px solid #d4af37;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+}
+
+.editar-categoria-nombre .campo-label {
+    display: block;
+    color: #111;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.editar-categoria-nombre__fila {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.editar-categoria-nombre__fila .campo-input {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    color: #222;
+    background: #fff;
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    transition: .18s;
+    outline: none;
+}
+
+.editar-categoria-nombre__fila .campo-input:focus {
+    border-color: #111;
+    box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.08);
+}
+
+/* Ensure primary/secondary buttons match the site's look */
+.btn-primary {
+    height: 48px;
+    min-width: 160px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 12px;
+    background: #d4af37;
+    color: #111;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .20s;
+}
+
+.btn-primary:hover {
+    background: #111;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.btn-eliminar-categoria {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 10px;
+    background: transparent;
+    color: #8f713f;
+    cursor: pointer;
+    transition: .18s;
+}
+
+.btn-eliminar-categoria:hover {
+    background: rgba(212, 175, 55, 0.08);
+    transform: translateY(-2px);
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal {
+    width: min(520px, 96%);
+    background: #fff;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.14);
+}
+
+.modal h2 {
+    margin-bottom: 8px;
+    font-family: 'Playfair Display', serif;
+}
+
+.modal p {
+    color: #333;
+    margin-bottom: 14px;
+}
+
+.modal .campo-input {
+    width: 100%;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Small screens adjustments */
+@media (max-width: 700px) {
+    .editar-categoria-nombre__fila {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .editar-categoria-nombre {
+        padding: 18px;
+        margin: 20px 12px;
+    }
+
+    .btn-primary {
+        width: 100%;
+        min-width: 0;
+    }
+}
