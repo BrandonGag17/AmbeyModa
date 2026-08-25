@@ -17,6 +17,9 @@ function CrearProducto() {
   const [nuevaCategoria, setNuevaCategoria] = useState("")
   const [idCategoria, setIdCategoria] = useState("")
 
+  const [fotosAdicionales, setFotosAdicionales] = useState([])
+  const [previewsAdicionales, setPreviewsAdicionales] = useState([])
+
   useEffect(() => {
     traerCategorias()
   }, [])
@@ -45,6 +48,18 @@ function CrearProducto() {
     }
 
     setCategorias(data || [])
+  }
+
+  const manejarFotosAdicionales = (e) => {
+    const files = Array.from(e.target.files || [])
+
+    setFotosAdicionales(files)
+
+    const previews = files.map((file) =>
+      URL.createObjectURL(file)
+    )
+
+    setPreviewsAdicionales(previews)
   }
 
   async function crearCategoria() {
@@ -85,24 +100,24 @@ function CrearProducto() {
   }
 
   async function agregarProducto(producto) {
-    console.log('Intentando crear producto:', producto)
-
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('Productos')
-        .insert([producto], { returning: 'minimal' })
+        .insert([producto])
+        .select('idProducto')
+        .single()
 
       if (error) {
-        console.error('Error al crear producto en Supabase:', error)
+        console.error('Error al crear producto:', error)
         alert(`Error al crear producto: ${error.message}`)
-        return false
+        return null
       }
 
-      return true
+      return data
     } catch (error) {
       console.error('Excepción al crear producto:', error)
-      alert('Error inesperado al crear el producto. Mira la consola para más detalles.')
-      return false
+      alert('Error inesperado al crear el producto.')
+      return null
     }
   }
 
@@ -114,44 +129,82 @@ function CrearProducto() {
       return
     }
 
-    setSubiendo(true)
-    let imagenFinal = ImagenUrl
-
-    if (ImagenFile) {
-      try {
-        imagenFinal = await convertirArchivoABase64(ImagenFile)
-      } catch (error) {
-        console.error('Error al convertir la imagen:', error)
-        alert('No se pudo procesar la imagen. Intenta con otro archivo.')
-        setSubiendo(false)
-        return
-      }
-    }
-
-    if (!imagenFinal) {
-      alert('Sube una imagen o pega una URL válida.')
-      setSubiendo(false)
+    if (!ImagenFile && !ImagenUrl) {
+      alert("Sube una imagen principal.")
       return
     }
 
-    const categoriaSeleccionada = categorias.find(
-      (categoria) => categoria.idcategoria?.toString() === idCategoria
-    )
+    setSubiendo(true)
 
-    const producto = {
-      Nombre,
-      Descripcion,
-      idCategoria: Number(idCategoria),
-      ImagenUrl: imagenFinal,
-      enStock: true,
-    }
+    try {
 
-    const creado = await agregarProducto(producto)
-    setSubiendo(false)
+      let imagenFinal = ImagenUrl
 
-    if (creado) {
+      if (ImagenFile) {
+        imagenFinal = await convertirArchivoABase64(ImagenFile)
+      }
+
+      if (!imagenFinal) {
+        alert("No se pudo procesar la imagen principal.")
+        setSubiendo(false)
+        return
+      }
+
+      const producto = {
+        Nombre,
+        Descripcion,
+        idCategoria: Number(idCategoria),
+        ImagenUrl: imagenFinal,
+        enStock: true,
+      }
+
+      const creado = await agregarProducto(producto)
+
+      if (!creado) {
+        setSubiendo(false)
+        return
+      }
+
+      for (let i = 0; i < fotosAdicionales.length; i++) {
+
+        const imagen = await convertirArchivoABase64(
+          fotosAdicionales[i]
+        )
+
+        const { error } = await supabase
+          .from('FotosProducto')
+          .insert({
+            idProducto: creado.idProducto,
+            ImagenUrl: imagen,
+            orden: i + 1
+          })
+
+        if (error) {
+          console.error('Error guardando foto adicional:', error)
+
+          alert(
+            'El producto se creó, pero hubo un problema guardando una de las fotos adicionales.'
+          )
+
+          setSubiendo(false)
+          return
+        }
+      }
+
       alert('Producto creado ✅')
+
       navigate('/')
+
+    } catch (error) {
+
+      console.error('Error creando producto:', error)
+
+      alert('Ocurrió un error al crear el producto.')
+
+    } finally {
+
+      setSubiendo(false)
+
     }
   }
 
@@ -264,6 +317,33 @@ function CrearProducto() {
           </div>
         )}
 
+
+        <div className="form-campo">
+          <label>¡Agregá más fotos a la descripción!</label>
+
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={manejarFotosAdicionales}
+          />
+
+          <small>
+            Podés seleccionar varias fotos.
+          </small>
+        </div>
+        {previewsAdicionales.length > 0 && (
+          <div className="previews-adicionales">
+            {previewsAdicionales.map((preview, index) => (
+              <img
+                key={index}
+                src={preview}
+                alt={`Vista previa ${index + 1}`}
+                className="preview-adicional"
+              />
+            ))}
+          </div>
+        )}
         <button
           className="guardar-btn"
           type="submit"
@@ -271,7 +351,6 @@ function CrearProducto() {
         >
           {subiendo ? "Subiendo..." : "Agregar producto"}
         </button>
-
       </form>
 
     </div>

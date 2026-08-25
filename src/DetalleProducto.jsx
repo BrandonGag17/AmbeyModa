@@ -14,6 +14,9 @@ function DetalleProducto() {
   const [previewUrl, setPreviewUrl] = useState('')
   const [categorias, setCategorias] = useState([])
 
+  const [fotos, setFotos] = useState([])
+  const [fotoActual, setFotoActual] = useState(0)
+
   useEffect(() => {
     traerCategorias()
     traerProducto()
@@ -61,6 +64,18 @@ function DetalleProducto() {
     setProducto(productoCompleto)
     setForm(productoCompleto)
     setPreviewUrl(productoCompleto.ImagenUrl || '')
+
+    const { data: fotosData, error: fotosError } = await supabase
+      .from('FotosProducto')
+      .select('*')
+      .eq('idProducto', p.idProducto)
+      .order('orden', { ascending: true })
+
+    if (fotosError) {
+      console.error(fotosError)
+    } else {
+      setFotos(fotosData || [])
+    }
   }
 
   const convertirArchivoABase64 = (file) => {
@@ -147,14 +162,87 @@ function DetalleProducto() {
       <div className="detalle-producto-contenido">
 
         <div className="detalle-producto-imagen">
-          {producto.ImagenUrl ? (
-            <img
-              src={producto.ImagenUrl}
-              alt={producto.Nombre}
-            />
+
+          {producto.ImagenUrl || fotos.length > 0 ? (
+
+            <div className="carrusel">
+
+              <button
+                className="carrusel-btn carrusel-anterior"
+                onClick={() => {
+                  const totalFotos = fotos.length + 1
+
+                  setFotoActual(
+                    fotoActual === 0
+                      ? totalFotos - 1
+                      : fotoActual - 1
+                  )
+                }}
+              >
+                ‹
+              </button>
+
+              <img
+                src={
+                  fotoActual === 0
+                    ? producto.ImagenUrl
+                    : fotos[fotoActual - 1]?.ImagenUrl
+                }
+                alt={`${producto.Nombre} - Foto ${fotoActual + 1}`}
+              />
+
+              <button
+                className="carrusel-btn carrusel-siguiente"
+                onClick={() => {
+                  const totalFotos = fotos.length + 1
+
+                  setFotoActual(
+                    fotoActual === totalFotos - 1
+                      ? 0
+                      : fotoActual + 1
+                  )
+                }}
+              >
+                ›
+              </button>
+
+              <div className="carrusel-indicadores">
+
+                <button
+                  className={
+                    fotoActual === 0
+                      ? "indicador activo"
+                      : "indicador"
+                  }
+                  onClick={() => setFotoActual(0)}
+                >
+                  ●
+                </button>
+
+                {fotos.map((foto, index) => (
+                  <button
+                    key={foto.idFoto}
+                    className={
+                      fotoActual === index + 1
+                        ? "indicador activo"
+                        : "indicador"
+                    }
+                    onClick={() => setFotoActual(index + 1)}
+                  >
+                    ●
+                  </button>
+                ))}
+
+              </div>
+
+            </div>
+
           ) : (
+
             <p className="sin-imagen">Sin imagen</p>
+
           )}
+
         </div>
 
 
