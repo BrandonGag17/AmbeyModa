@@ -96,12 +96,49 @@
   height: 24px;
   object-fit: contain;
   filter: brightness(0) invert(1);
+  flex: 0 0 24px;
   transition: transform 0.2s ease;
 }
 
 
 .avisos__icono:hover {
   transform: scale(1.15);
+}
+
+
+.boton-instagram,
+.boton-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.boton-instagram {
+  background: linear-gradient(135deg, #833ab4, #fd1d1d 55%, #fcb045);
+}
+
+.boton-whatsapp {
+  background-color: #20b858;
+}
+
+.boton-instagram:hover,
+.boton-whatsapp:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+.boton-whatsapp:hover {
+  background-color: #159447;
 }
 
 
@@ -146,6 +183,14 @@
   .avisos__icono {
     width: 22px;
     height: 22px;
+    flex-basis: 22px;
+  }
+
+  .boton-instagram,
+  .boton-whatsapp {
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 13px;
   }
 
   .navbar__logo {
