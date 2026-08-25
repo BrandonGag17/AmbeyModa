@@ -247,6 +247,38 @@ textarea {
 
 }
 
+.preview-adicional-contenedor {
+
+    position: relative;
+
+}
+
+.eliminar-preview-btn {
+
+    position: absolute;
+
+    top: 8px;
+
+    right: 8px;
+
+    width: 36px;
+
+    height: 36px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #c0392b;
+
+    color: white;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+}
+
 .guardar-btn {
 
     width: 100%;

@@ -16,6 +16,10 @@ function DetalleProducto() {
 
   const [fotos, setFotos] = useState([])
   const [fotoActual, setFotoActual] = useState(0)
+  const [cargandoFotos, setCargandoFotos] = useState(true)
+  const [fotosNuevas, setFotosNuevas] = useState([])
+  const [fotosReemplazadas, setFotosReemplazadas] = useState({})
+  const [fotosAEliminar, setFotosAEliminar] = useState([])
 
   useEffect(() => {
     traerCategorias()
@@ -76,6 +80,77 @@ function DetalleProducto() {
     } else {
       setFotos(fotosData || [])
     }
+
+    Object.values(fotosReemplazadas).forEach((reemplazo) => {
+      URL.revokeObjectURL(reemplazo.preview)
+    })
+    fotosNuevas.forEach((foto) => URL.revokeObjectURL(foto.preview))
+    setFotosNuevas([])
+    setFotosReemplazadas({})
+    setFotosAEliminar([])
+    setCargandoFotos(false)
+  }
+
+  const manejarFotoAdicional = (e, idFoto) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const preview = URL.createObjectURL(file)
+    setFotosReemplazadas((actuales) => {
+      const reemplazoAnterior = actuales[idFoto]
+      if (reemplazoAnterior) URL.revokeObjectURL(reemplazoAnterior.preview)
+
+      return {
+        ...actuales,
+        [idFoto]: { file, preview }
+      }
+    })
+    setFotos((actuales) => actuales.map((foto) =>
+      foto.idFoto === idFoto
+        ? { ...foto, ImagenUrl: preview }
+        : foto
+    ))
+    e.target.value = ''
+  }
+
+  const eliminarFotoExistente = (idFoto) => {
+    const reemplazo = fotosReemplazadas[idFoto]
+    if (reemplazo) URL.revokeObjectURL(reemplazo.preview)
+
+    setFotos((actuales) => actuales.filter((foto) => foto.idFoto !== idFoto))
+    setFotosAEliminar((actuales) => [...actuales, idFoto])
+    setFotosReemplazadas((actuales) => {
+      const restantes = { ...actuales }
+      delete restantes[idFoto]
+      return restantes
+    })
+    setFotoActual(0)
+  }
+
+  const manejarNuevasFotos = (e) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    setFotosNuevas((actuales) => [
+      ...actuales,
+      ...files.map((file) => ({
+        file,
+        preview: URL.createObjectURL(file)
+      }))
+    ])
+    e.target.value = ''
+  }
+
+  const eliminarFotoNueva = (index) => {
+    URL.revokeObjectURL(fotosNuevas[index].preview)
+    setFotosNuevas((actuales) =>
+      actuales.filter((_, fotoIndex) => fotoIndex !== index)
+    )
+  }
+
+  async function cancelarEdicion() {
+    setEditando(false)
+    await traerProducto()
   }
 
   const convertirArchivoABase64 = (file) => {
@@ -116,6 +191,50 @@ function DetalleProducto() {
       alert('Error al guardar')
       console.error(error)
       return
+    }
+
+    for (const idFoto of fotosAEliminar) {
+      const { error: eliminarError } = await supabase
+        .from('FotosProducto')
+        .delete()
+        .eq('idFoto', idFoto)
+
+      if (eliminarError) {
+        alert('El producto se guardó, pero no se pudo eliminar una foto.')
+        console.error(eliminarError)
+        return
+      }
+    }
+
+    for (const [idFoto, reemplazo] of Object.entries(fotosReemplazadas)) {
+      const imagen = await convertirArchivoABase64(reemplazo.file)
+      const { error: reemplazarError } = await supabase
+        .from('FotosProducto')
+        .update({ ImagenUrl: imagen })
+        .eq('idFoto', idFoto)
+
+      if (reemplazarError) {
+        alert('El producto se guardó, pero no se pudo reemplazar una foto.')
+        console.error(reemplazarError)
+        return
+      }
+    }
+
+    for (let i = 0; i < fotosNuevas.length; i++) {
+      const imagen = await convertirArchivoABase64(fotosNuevas[i].file)
+      const { error: agregarError } = await supabase
+        .from('FotosProducto')
+        .insert({
+          idProducto: id,
+          ImagenUrl: imagen,
+          orden: fotos.length + i + 1
+        })
+
+      if (agregarError) {
+        alert('El producto se guardó, pero no se pudo agregar una foto.')
+        console.error(agregarError)
+        return
+      }
     }
 
     alert('Guardado ✅')
@@ -166,6 +285,10 @@ function DetalleProducto() {
           {producto.ImagenUrl || fotos.length > 0 ? (
 
             <div className="carrusel">
+
+              {cargandoFotos && (
+                <div className="cargando-fotos" role="status" aria-label="Cargando fotos" />
+              )}
 
               <button
                 className="carrusel-btn carrusel-anterior"
@@ -388,6 +511,56 @@ function DetalleProducto() {
 
         </div>
 
+        {editando && (
+          <div className="fotos-adicionales-editor">
+            <span className="campo-label">Fotos adicionales</span>
+
+            <div className="fotos-editor-lista">
+              {fotos.map((foto, index) => (
+                <div className="foto-editor" key={foto.idFoto}>
+                  <img src={foto.ImagenUrl} alt={`Foto adicional ${index + 1}`} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => manejarFotoAdicional(e, foto.idFoto)}
+                    aria-label={`Reemplazar foto adicional ${index + 1}`}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-eliminar-foto"
+                    onClick={() => eliminarFotoExistente(foto.idFoto)}
+                  >
+                    🗑️ Eliminar
+                  </button>
+                </div>
+              ))}
+
+              {fotosNuevas.map((foto, index) => (
+                <div className="foto-editor" key={foto.preview}>
+                  <img src={foto.preview} alt={`Foto nueva ${index + 1}`} />
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-eliminar-foto"
+                    onClick={() => eliminarFotoNueva(index)}
+                  >
+                    🗑️ Eliminar
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <label className="agregar-fotos-label">
+              Agregar fotos
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={manejarNuevasFotos}
+              />
+            </label>
+          </div>
+        )}
+
 
         <div className="detalle-producto-acciones">
 
@@ -402,7 +575,7 @@ function DetalleProducto() {
 
               <button
                 className="btn btn-secondary"
-                onClick={() => setEditando(false)}
+                onClick={cancelarEdicion}
               >
                 Cancelar
               </button>

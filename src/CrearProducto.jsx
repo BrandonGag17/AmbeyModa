@@ -53,13 +53,31 @@ function CrearProducto() {
   const manejarFotosAdicionales = (e) => {
     const files = Array.from(e.target.files || [])
 
-    setFotosAdicionales(files)
+    if (files.length === 0) return
 
     const previews = files.map((file) =>
       URL.createObjectURL(file)
     )
 
-    setPreviewsAdicionales(previews)
+    setFotosAdicionales((fotosActuales) => [
+      ...fotosActuales,
+      ...files
+    ])
+    setPreviewsAdicionales((previewsActuales) => [
+      ...previewsActuales,
+      ...previews
+    ])
+    e.target.value = ''
+  }
+
+  const eliminarFotoAdicional = (index) => {
+    URL.revokeObjectURL(previewsAdicionales[index])
+    setFotosAdicionales((fotosActuales) =>
+      fotosActuales.filter((_, fotoIndex) => fotoIndex !== index)
+    )
+    setPreviewsAdicionales((previewsActuales) =>
+      previewsActuales.filter((_, fotoIndex) => fotoIndex !== index)
+    )
   }
 
   async function crearCategoria() {
@@ -335,12 +353,22 @@ function CrearProducto() {
         {previewsAdicionales.length > 0 && (
           <div className="previews-adicionales">
             {previewsAdicionales.map((preview, index) => (
-              <img
-                key={index}
-                src={preview}
-                alt={`Vista previa ${index + 1}`}
-                className="preview-adicional"
-              />
+              <div className="preview-adicional-contenedor" key={preview}>
+                <img
+                  src={preview}
+                  alt={`Vista previa ${index + 1}`}
+                  className="preview-adicional"
+                />
+                <button
+                  type="button"
+                  className="eliminar-preview-btn"
+                  onClick={() => eliminarFotoAdicional(index)}
+                  aria-label={`Eliminar foto adicional ${index + 1}`}
+                  title="Eliminar foto"
+                >
+                  X 
+                </button>
+              </div>
             ))}
           </div>
         )}
