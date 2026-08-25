@@ -40,7 +40,9 @@ function Navbar() {
     }
   }, [idProducto])
 
-  const mensajeWhatsapp = `Hola, buenas tardes. Me interesó este ${nombreProducto || 'producto'} y quisiera saber más. ¿Me podrías ayudar?`
+  const mensajeWhatsapp = esDetalleProducto
+    ? `Hola, buenas tardes. Me interesó este ${nombreProducto || 'producto'} y quisiera saber más. ¿Me podrías ayudar?`
+    : 'Hola, buenas tardes, vengo desde su catálogo web y quisiera saber más. ¿Me podrías ayudar?'
 
   return (
     <>
@@ -73,21 +75,19 @@ function Navbar() {
             <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" className="avisos__icono" />
             @ambey_moda
           </a>
-          {esDetalleProducto && (
-            <a
-              href={`https://wa.me/5491169092236?text=${encodeURIComponent(mensajeWhatsapp)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="boton-whatsapp"
-            >
-              <img
-                src="https://cdn.simpleicons.org/whatsapp/ffffff"
-                alt=""
-                className="avisos__icono"
-              />
-              Hablar por WhatsApp
-            </a>
-          )}
+          <a
+            href={`https://wa.me/5491169092236?text=${encodeURIComponent(mensajeWhatsapp)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="boton-whatsapp"
+          >
+            <img
+              src="https://cdn.simpleicons.org/whatsapp/ffffff"
+              alt=""
+              className="avisos__icono"
+            />
+            Hablar por WhatsApp
+          </a>
         </div>
       </nav>
     </>
