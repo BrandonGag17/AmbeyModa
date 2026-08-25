@@ -10,7 +10,6 @@
   z-index: 20;
 }
 
-
 .navbar__logo {
   width: 7%;
   height: auto;
@@ -88,6 +87,14 @@
 .avisos__texto {
   margin: 0;
   letter-spacing: 0.03em;
+}
+
+
+.avisos__acciones {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
 }
 
 
@@ -176,6 +183,11 @@
     text-align: center;
   }
 
+  .avisos__acciones {
+    width: 100%;
+    justify-content: center;
+  }
+
   .avisos__texto {
     font-size: 14px;
   }
@@ -190,7 +202,7 @@
   .boton-whatsapp {
     min-height: 38px;
     padding: 0 14px;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .navbar__logo {

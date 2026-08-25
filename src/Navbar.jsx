@@ -40,7 +40,7 @@ function Navbar() {
     }
   }, [idProducto])
 
-  const mensajeWhatsapp = `Hola, buenas tardes. Me interesó este ${nombreProducto || 'producto'} y quisiera saber más. ¿Me podrían ayudar?`
+  const mensajeWhatsapp = `Hola, buenas tardes. Me interesó este ${nombreProducto || 'producto'} y quisiera saber más. ¿Me podrías ayudar?`
 
   return (
     <>
@@ -63,30 +63,32 @@ function Navbar() {
       </nav>
       <nav className="avisos">
         <p className="avisos__texto">¡Seguinos en nuestras redes sociales!</p>
-        <a
-          href="https://www.instagram.com/ambey_moda/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="boton-instagram"
-        >
-          <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" className="avisos__icono" />
-          @ambey_moda
-        </a>
-        {esDetalleProducto && (
+        <div className="avisos__acciones">
           <a
-            href={`https://wa.me/5491169092236?text=${encodeURIComponent(mensajeWhatsapp)}`}
+            href="https://www.instagram.com/ambey_moda/"
             target="_blank"
             rel="noopener noreferrer"
-            className="boton-whatsapp"
+            className="boton-instagram"
           >
-            <img
-              src="https://cdn.simpleicons.org/whatsapp/ffffff"
-              alt=""
-              className="avisos__icono"
-            />
-            Hablar por WhatsApp
+            <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" className="avisos__icono" />
+            @ambey_moda
           </a>
-        )}
+          {esDetalleProducto && (
+            <a
+              href={`https://wa.me/5491169092236?text=${encodeURIComponent(mensajeWhatsapp)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="boton-whatsapp"
+            >
+              <img
+                src="https://cdn.simpleicons.org/whatsapp/ffffff"
+                alt=""
+                className="avisos__icono"
+              />
+              Hablar por WhatsApp
+            </a>
+          )}
+        </div>
       </nav>
     </>
 
