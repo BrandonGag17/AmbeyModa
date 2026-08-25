@@ -62,7 +62,7 @@ function Navbar() {
         </Link>
       </nav>
       <nav className="avisos">
-        <p className="avisos__texto">¡Seguinos en nuestras redes sociales!</p>
+        <p className="avisos__texto">¡Seguinos en nuestras redes sociales y contactanos!</p>
         <div className="avisos__acciones">
           <a
             href="https://www.instagram.com/ambey_moda/"
