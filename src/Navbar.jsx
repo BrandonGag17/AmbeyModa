@@ -74,7 +74,7 @@ function Navbar() {
         </a>
         {esDetalleProducto && (
           <a
-            href={`https://wa.me/549111234567?text=${encodeURIComponent(mensajeWhatsapp)}`}
+            href={`https://wa.me/5491169092236?text=${encodeURIComponent(mensajeWhatsapp)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="boton-whatsapp"
