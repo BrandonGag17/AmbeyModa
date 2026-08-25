@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
+import { convertirArchivoABase64 } from './utils/imageUtils'
+import { useIsAdmin } from './hooks/useIsAdmin'
 import './DetalleProducto.css'
 
 function DetalleProducto() {
 
   const navigate = useNavigate()
   const { id } = useParams()
+  const esAdmin = useIsAdmin()
+  
   const [producto, setProducto] = useState(null)
   const [editando, setEditando] = useState(false)
   const [form, setForm] = useState(null)
-  const [imagenFile, setImagenFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const [categorias, setCategorias] = useState([])
 
@@ -21,14 +24,12 @@ function DetalleProducto() {
   const [fotosReemplazadas, setFotosReemplazadas] = useState({})
   const [fotosAEliminar, setFotosAEliminar] = useState([])
 
-
   useEffect(() => {
-    traerCategorias()
     traerProducto()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [id])
 
-  async function traerCategorias() {
+  const traerCategorias = useCallback(async () => {
     const { data, error } = await supabase
       .from('categorias')
       .select('idcategoria, nombre')
@@ -40,19 +41,18 @@ function DetalleProducto() {
     }
 
     setCategorias(data || [])
-  }
-
-  const [esAdmin, setEsAdmin] = useState(false)
+  }, [])
 
   useEffect(() => {
-    const adminGuardado = localStorage.getItem('esAdmin')
-    setEsAdmin(adminGuardado === 'true')
-  }, [])
+    if (editando) {
+      traerCategorias()
+    }
+  }, [editando, traerCategorias])
 
   async function traerProducto() {
     const { data, error } = await supabase
       .from('Productos')
-      .select('*')
+      .select('idProducto, Nombre, Descripcion, ImagenUrl, idCategoria, enStock')
       .eq('idProducto', id)
 
     if (error) {
@@ -79,7 +79,7 @@ function DetalleProducto() {
 
     const { data: fotosData, error: fotosError } = await supabase
       .from('FotosProducto')
-      .select('*')
+      .select('idFoto, ImagenUrl, orden')
       .eq('idProducto', p.idProducto)
       .order('orden', { ascending: true })
 
@@ -161,19 +161,9 @@ function DetalleProducto() {
     await traerProducto()
   }
 
-  const convertirArchivoABase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result)
-      reader.onerror = () => reject(new Error('Error convirtiendo el archivo a base64'))
-      reader.readAsDataURL(file)
-    })
-  }
-
   const manejarArchivo = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-    setImagenFile(file)
     try {
       const base64 = await convertirArchivoABase64(file)
       setForm({ ...form, ImagenUrl: base64 })

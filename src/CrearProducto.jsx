@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
+import { convertirArchivoABase64 } from './utils/imageUtils'
 import './CrearProducto.css'
 
 function CrearProducto() {
@@ -107,14 +108,6 @@ function CrearProducto() {
     }
     setNuevaCategoria('')
     setMostrarNuevaCategoria(false)
-  }
-  const convertirArchivoABase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result)
-      reader.onerror = () => reject(new Error('Error convirtiendo el archivo a base64'))
-      reader.readAsDataURL(file)
-    })
   }
 
   async function agregarProducto(producto) {

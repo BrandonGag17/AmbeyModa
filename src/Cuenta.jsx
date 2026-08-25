@@ -1,17 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./Cuenta.css";
 
 function Cuenta() {
     const [usuario, setUsuario] = useState("");
     const [contrasena, setContrasena] = useState("");
     const [esAdmin, setEsAdmin] = useState(false);
-
-    useEffect(() => {
-        const adminGuardado = localStorage.getItem("esAdmin");
-        if (adminGuardado === "true") {
-            setEsAdmin(true);
-        }
-    }, []);
 
     function iniciarSesion() {
         if (usuario === "adrianita" && contrasena === "shajor") {

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
+import { useIsAdmin } from './hooks/useIsAdmin'
 import './Inicio.css'
 
 function Inicio() {
@@ -8,8 +9,9 @@ function Inicio() {
     const [loading, setLoading] = useState(true)
     const [categorias, setCategorias] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
-    const navigate = useNavigate()
     const [busqueda, setBusqueda] = useState('')
+    const navigate = useNavigate()
+    const esAdmin = useIsAdmin()
 
     useEffect(() => {
         cargarProductos()
@@ -32,7 +34,7 @@ function Inicio() {
 
     async function cargarProductos(categoriaId = null) {
         setLoading(true)
-        let query = supabase.from('Productos').select('*')
+        let query = supabase.from('Productos').select('idProducto, Nombre, Descripcion, ImagenUrl, idCategoria')
         if (categoriaId) query = query.eq('idCategoria', Number(categoriaId))
 
         const { data, error } = await query
@@ -42,20 +44,16 @@ function Inicio() {
             console.error('Error cargando productos', error)
             return
         }
-        setProductos(data)
+        setProductos(data || [])
         setLoading(false)
     }
 
-    const productosFiltrados = productos.filter((prod) =>
-        prod.Nombre.toLowerCase().includes(busqueda.toLowerCase())
+    const productosFiltrados = useMemo(() => 
+        productos.filter((prod) =>
+            prod.Nombre.toLowerCase().includes(busqueda.toLowerCase())
+        ),
+        [productos, busqueda]
     )
-
-    const [esAdmin, setEsAdmin] = useState(false)
-
-    useEffect(() => {
-        const adminGuardado = localStorage.getItem('esAdmin')
-        setEsAdmin(adminGuardado === 'true')
-    }, [])
 
     function crearProducto() {
         if (!esAdmin) {
@@ -63,15 +61,6 @@ function Inicio() {
             return
         }
         navigate('/crear-producto')
-    }
-
-    const formatearPrecio = (precio) => {
-        const valor = Number(precio)
-        if (Number.isNaN(valor)) return 'ARS 0,00'
-        return valor.toLocaleString('es-AR', {
-            style: 'currency',
-            currency: 'ARS'
-        })
     }
 
     return (

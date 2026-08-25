@@ -44,11 +44,11 @@ function EditarCategoria() {
         setCategoria(categoriaData)
         setNombre(categoriaData.nombre)
 
-        // Productos de la categoría
+        // Productos de la categoría - solo campos necesarios
         const { data: productosData, error: productosError } =
             await supabase
                 .from('Productos')
-                .select('*')
+                .select('idProducto, Nombre, Descripcion, ImagenUrl')
                 .eq('idCategoria', Number(id))
 
         if (productosError) {

@@ -9,16 +9,13 @@ function Navbar() {
   const { pathname } = useLocation()
   const [nombreProducto, setNombreProducto] = useState('')
   const idProducto = pathname.match(/^\/detalle-producto\/([^/]+)/)?.[1]
-  const esDetalleProducto = Boolean(idProducto)
 
   useEffect(() => {
     let cancelado = false
 
     if (!idProducto) {
       setNombreProducto('')
-      return () => {
-        cancelado = true
-      }
+      return
     }
 
     async function traerNombreProducto() {
@@ -40,7 +37,7 @@ function Navbar() {
     }
   }, [idProducto])
 
-  const mensajeWhatsapp = esDetalleProducto
+  const mensajeWhatsapp = idProducto
     ? `Hola, buenas tardes. Me interesó este ${nombreProducto || 'producto'} y quisiera saber más. ¿Me podrías ayudar?`
     : 'Hola, buenas tardes, vengo desde su catálogo web y quisiera saber más. ¿Me podrías ayudar?'
 
