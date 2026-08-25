@@ -21,6 +21,7 @@ function DetalleProducto() {
   const [fotosReemplazadas, setFotosReemplazadas] = useState({})
   const [fotosAEliminar, setFotosAEliminar] = useState([])
 
+
   useEffect(() => {
     traerCategorias()
     traerProducto()
@@ -40,6 +41,13 @@ function DetalleProducto() {
 
     setCategorias(data || [])
   }
+
+  const [esAdmin, setEsAdmin] = useState(false)
+
+  useEffect(() => {
+    const adminGuardado = localStorage.getItem('esAdmin')
+    setEsAdmin(adminGuardado === 'true')
+  }, [])
 
   async function traerProducto() {
     const { data, error } = await supabase
@@ -582,19 +590,23 @@ function DetalleProducto() {
             </>
           ) : (
             <>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setEditando(true)}
-              >
-                Editar
-              </button>
+              {esAdmin && (
+                <>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setEditando(true)}
+                  >
+                    Editar
+                  </button>
 
-              <button
-                className="btn btn-danger"
-                onClick={eliminarProducto}
-              >
-                Eliminar
-              </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={eliminarProducto}
+                  >
+                    Eliminar
+                  </button>
+                </>
+              )}
             </>
           )}
 
