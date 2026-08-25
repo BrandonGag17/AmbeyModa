@@ -34,6 +34,11 @@
     object-fit: contain;
 }
 
+.descripcion-valor {
+    text-align: left;
+    white-space: pre-line;
+}
+
 /* Campos */
 .detalle-producto-campos {
     display: flex;

@@ -191,7 +191,7 @@ function DetalleProducto() {
                 }
               />
             ) : (
-              <p className="campo-valor">
+              <p className="campo-valor descripcion-valor">
                 {producto.Descripcion}
               </p>
             )}
