@@ -23,6 +23,7 @@ function DetalleProducto() {
   const [fotosNuevas, setFotosNuevas] = useState([])
   const [fotosReemplazadas, setFotosReemplazadas] = useState({})
   const [fotosAEliminar, setFotosAEliminar] = useState([])
+  const [origenZoom, setOrigenZoom] = useState('50% 50%')
 
   useEffect(() => {
     traerProducto()
@@ -270,6 +271,13 @@ function DetalleProducto() {
     navigate('/')
   }
 
+  function actualizarOrigenZoom(e) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    setOrigenZoom(`${x}% ${y}%`)
+  }
+
   if (!producto) return <p>Cargando...</p>
 
   return (
@@ -282,7 +290,11 @@ function DetalleProducto() {
 
           {producto.ImagenUrl || fotos.length > 0 ? (
 
-            <div className="carrusel">
+            <div
+              className="carrusel"
+              onMouseMove={actualizarOrigenZoom}
+              onMouseLeave={() => setOrigenZoom('50% 50%')}
+            >
 
               {cargandoFotos && (
                 <div className="cargando-fotos" role="status" aria-label="Cargando fotos" />
@@ -310,6 +322,7 @@ function DetalleProducto() {
                     : fotos[fotoActual - 1]?.ImagenUrl
                 }
                 alt={`${producto.Nombre} - Foto ${fotoActual + 1}`}
+                style={{ '--origen-zoom': origenZoom }}
               />
 
               <button
