@@ -34,7 +34,7 @@ function Inicio() {
 
     async function cargarProductos(categoriaId = null) {
         setLoading(true)
-        let query = supabase.from('Productos').select('idProducto, Nombre, Descripcion, ImagenUrl, idCategoria')
+        let query = supabase.from('Productos').select('idProducto, Nombre, Descripcion, ImagenUrl, idCategoria, enStock')
         if (categoriaId) query = query.eq('idCategoria', Number(categoriaId))
 
         const { data, error } = await query
@@ -191,6 +191,10 @@ function Inicio() {
                                 <p className="producto-card__subtitle">
                                     {prod.Descripcion || "Accesorio de moda"}
                                 </p>
+
+                                {!prod.enStock && (
+                                    <span className="producto-card__stock">Sin stock</span>
+                                )}
 
                             </div>
 

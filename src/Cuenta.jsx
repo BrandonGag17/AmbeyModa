@@ -1,20 +1,35 @@
-import { useState } from "react";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from './supabaseClient'
+import { useAuth } from './hooks/useAuth'
 import "./Cuenta.css";
 
 function Cuenta() {
-    const [usuario, setUsuario] = useState("");
-    const [contrasena, setContrasena] = useState("");
-    const [esAdmin, setEsAdmin] = useState(false);
+    const navigate = useNavigate()
+    const { session, cargando } = useAuth()
+    const [email, setEmail] = useState('')
+    const [contrasena, setContrasena] = useState('')
+    const [procesando, setProcesando] = useState(false)
 
-    function iniciarSesion() {
-        if (usuario === "adrianita" && contrasena === "shajor") {
-            setEsAdmin(true);
-            localStorage.setItem("esAdmin", "true");
-        } else {
-            alert("Usuario o contraseña incorrectos");
-            setEsAdmin(false);
-            localStorage.removeItem("esAdmin");
+    async function iniciarSesion(e) {
+        e.preventDefault()
+        setProcesando(true)
+
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password: contrasena
+        })
+
+        if (error) {
+            alert('No se pudo iniciar sesión. Revisá tu email y contraseña.')
         }
+
+        setProcesando(false)
+    }
+
+    async function cerrarSesion() {
+        await supabase.auth.signOut()
+        navigate('/')
     }
 
     return (
@@ -23,29 +38,38 @@ function Cuenta() {
 
                 <p>Panel de administración</p>
 
-                <input
-                    type="text"
-                    placeholder="Usuario"
-                    value={usuario}
-                    onChange={(e) => setUsuario(e.target.value)}
-                />
+                {cargando ? <p>Verificando sesión...</p> : session ? (
+                    <>
+                        <p className="admin-ok">Sesión iniciada</p>
+                        <button type="button" onClick={cerrarSesion}>
+                            Cerrar sesión
+                        </button>
+                    </>
+                ) : (
+                    <form onSubmit={iniciarSesion}>
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            autoComplete="email"
+                            required
+                        />
 
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={contrasena}
-                    onChange={(e) => setContrasena(e.target.value)}
-                />
+                        <input
+                            type="password"
+                            placeholder="Contraseña"
+                            value={contrasena}
+                            onChange={(e) => setContrasena(e.target.value)}
+                            autoComplete="current-password"
+                            required
+                        />
 
-                <button onClick={iniciarSesion}>
-                    Iniciar sesión
-                </button>
-
-                {esAdmin &&
-                    <span className="admin-ok">
-                        ✓ Modo Mame Sheine activado
-                    </span>
-                }
+                        <button type="submit" disabled={procesando}>
+                            {procesando ? 'Ingresando...' : 'Iniciar sesión'}
+                        </button>
+                    </form>
+                )}
 
             </div>
         </div>

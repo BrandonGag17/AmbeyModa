@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import { convertirArchivoABase64 } from './utils/imageUtils'
+import { useIsAdmin } from './hooks/useIsAdmin'
 import './CrearProducto.css'
 
 function CrearProducto() {
   const navigate = useNavigate()
+  const esAdmin = useIsAdmin()
 
   const [Nombre, setNombre] = useState('')
   const [Descripcion, setDescripcion] = useState('')
@@ -82,6 +84,7 @@ function CrearProducto() {
   }
 
   async function crearCategoria() {
+    if (!esAdmin) return
     if (!nuevaCategoria.trim()) {
       alert('Escribí un nombre para la categoría.')
       return
@@ -111,6 +114,7 @@ function CrearProducto() {
   }
 
   async function agregarProducto(producto) {
+    if (!esAdmin) return null
     try {
       const { data, error } = await supabase
         .from('Productos')
@@ -134,6 +138,11 @@ function CrearProducto() {
 
   const manejarSubmit = async (e) => {
     e.preventDefault()
+
+    if (!esAdmin) {
+      alert('Tu sesión no permite realizar esta acción.')
+      return
+    }
 
     if (!Nombre || !Descripcion || !idCategoria) {
       alert("Completa todos los campos antes de enviar.")

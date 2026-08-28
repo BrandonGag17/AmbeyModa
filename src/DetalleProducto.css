@@ -1,4 +1,5 @@
 .detalle-producto {
+    position: relative;
     width: min(70vw, 1400px);
     max-width: 1400px;
     margin: 40px auto;
@@ -74,6 +75,11 @@
     color: #222;
     font-size: 19px;
     line-height: 1.6;
+}
+
+.campo-valor.sin-stock {
+    color: #c0392b;
+    font-weight: 700;
 }
 
 
@@ -394,5 +400,85 @@ input[type="file"] {
 
     .detalle-producto-imagen {
         height: 480px;
+    }
+}
+
+.campo-fila > .campo-fila {
+    grid-column: 1 / -1;
+}
+
+.imagen-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+.selector-imagen {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.selector-imagen:hover {
+    background: #333;
+}
+
+.selector-imagen .input-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.imagen-editor .campo-input {
+    width: 100%;
+}
+
+.imagen-editor .imagen-preview {
+    width: min(220px, 100%);
+    height: 220px;
+    margin: 0;
+    object-fit: contain;
+    background: #f8f8f8;
+}
+
+.guardando-producto {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.82);
+    color: #222;
+    font-weight: 600;
+}
+
+.guardando-producto__spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(176, 141, 87, 0.25);
+    border-top-color: #b08d57;
+    border-radius: 50%;
+    animation: girar-guardando 0.8s linear infinite;
+}
+
+@keyframes girar-guardando {
+    to {
+        transform: rotate(360deg);
     }
 }

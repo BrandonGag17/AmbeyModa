@@ -4,10 +4,12 @@ import { useLocation } from 'react-router-dom'
 import './Navbar.css'
 import logo from './assets/hero.png'
 import { supabase } from './supabaseClient'
+import { useAuth } from './hooks/useAuth'
 
 function Navbar() {
   const { pathname } = useLocation()
   const [nombreProducto, setNombreProducto] = useState('')
+  const { session } = useAuth()
   const idProducto = pathname.match(/^\/detalle-producto\/([^/]+)/)?.[1]
 
   useEffect(() => {
@@ -41,6 +43,10 @@ function Navbar() {
     ? `Hola, buenas tardes. Me interesó este ${nombreProducto || 'producto'} y quisiera saber más. ¿Me podrías ayudar?`
     : 'Hola, buenas tardes, vengo desde su catálogo web y quisiera saber más. ¿Me podrías ayudar?'
 
+  async function cerrarSesion() {
+    await supabase.auth.signOut()
+  }
+
   return (
     <>
       <nav className="navbar">
@@ -59,6 +65,11 @@ function Navbar() {
         <Link to="/cuenta" className="navbar__link">
           Cuenta
         </Link>
+        {session && (
+          <button type="button" className="navbar__logout" onClick={cerrarSesion}>
+            Cerrar sesión
+          </button>
+        )}
       </nav>
       <nav className="avisos">
         <p className="avisos__texto">¡Seguinos en nuestras redes sociales y contactanos!</p>

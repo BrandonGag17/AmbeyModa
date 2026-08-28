@@ -202,6 +202,14 @@ body {
     display: none;
 }
 
+.producto-card__stock {
+    display: inline-block;
+    margin-top: 8px;
+    color: #c0392b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
 .producto-card__meta {
     color: #d4af37;
     font-size: 22px;

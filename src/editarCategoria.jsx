@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import './Inicio.css'
 import './editarCategoria.css'
+import { useIsAdmin } from './hooks/useIsAdmin'
 
 function EditarCategoria() {
 
     const { id } = useParams()
     const navigate = useNavigate()
+    const esAdmin = useIsAdmin()
 
     const [categoria, setCategoria] = useState(null)
     const [nombre, setNombre] = useState('')
@@ -19,11 +21,7 @@ function EditarCategoria() {
     const [productoSeleccionado, setProductoSeleccionado] = useState(null)
     const [nuevaCategoria, setNuevaCategoria] = useState('')
 
-    useEffect(() => {
-        cargarDatos()
-    }, [id])
-
-    async function cargarDatos() {
+    const cargarDatos = useCallback(async () => {
 
         setLoading(true)
 
@@ -48,7 +46,7 @@ function EditarCategoria() {
         const { data: productosData, error: productosError } =
             await supabase
                 .from('Productos')
-                .select('idProducto, Nombre, Descripcion, ImagenUrl')
+                .select('idProducto, Nombre, Descripcion, ImagenUrl, enStock')
                 .eq('idCategoria', Number(id))
 
         if (productosError) {
@@ -75,9 +73,14 @@ function EditarCategoria() {
         setCategorias(categoriasData || [])
 
         setLoading(false)
-    }
+    }, [id])
+
+    useEffect(() => {
+        cargarDatos()
+    }, [cargarDatos])
 
     async function guardarNombre() {
+        if (!esAdmin) return
 
         if (!nombre.trim()) {
             alert('El nombre de la categoría no puede estar vacío.')
@@ -123,6 +126,7 @@ function EditarCategoria() {
     }
 
     async function moverProducto() {
+        if (!esAdmin) return
 
         if (!nuevaCategoria) {
             alert('Seleccioná una categoría.')

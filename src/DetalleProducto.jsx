@@ -24,6 +24,7 @@ function DetalleProducto() {
   const [fotosReemplazadas, setFotosReemplazadas] = useState({})
   const [fotosAEliminar, setFotosAEliminar] = useState([])
   const [origenZoom, setOrigenZoom] = useState('50% 50%')
+  const [guardando, setGuardando] = useState(false)
 
   useEffect(() => {
     traerProducto()
@@ -184,21 +185,41 @@ function DetalleProducto() {
   }
 
   async function guardarCambios() {
-    const { error } = await supabase
+    if (!esAdmin || guardando) {
+      alert('Debes iniciar sesión para editar este producto.')
+      return
+    }
+
+    setGuardando(true)
+
+    try {
+    const { data: productoActualizado, error } = await supabase
       .from('Productos')
       .update({
         Nombre: form.Nombre,
         Descripcion: form.Descripcion,
         ImagenUrl: form.ImagenUrl,
         idCategoria: form.idCategoria,
+        enStock: Boolean(form.enStock),
       })
       .eq('idProducto', id)
+      .select('idProducto, Nombre, Descripcion, ImagenUrl, idCategoria, enStock')
+      .maybeSingle()
 
-    if (error) {
-      alert('Error al guardar')
+    if (error || !productoActualizado) {
+      alert('No se pudo guardar el producto. Revisá que la sesión tenga permisos de administración e intentá de nuevo.')
       console.error(error)
       return
     }
+
+    setProducto((actual) => actual
+      ? { ...actual, ...productoActualizado }
+      : actual
+    )
+    setForm((actual) => actual
+      ? { ...actual, ...productoActualizado }
+      : actual
+    )
 
     for (const idFoto of fotosAEliminar) {
       const { error: eliminarError } = await supabase
@@ -247,10 +268,21 @@ function DetalleProducto() {
     alert('Guardado ✅')
     setEditando(false)
     // refrescar
-    traerProducto()
+    await traerProducto()
+    } catch (error) {
+      console.error('Error guardando producto:', error)
+      alert('OcurriÃ³ un error al guardar el producto.')
+    } finally {
+      setGuardando(false)
+    }
   }
 
   async function eliminarProducto() {
+    if (!esAdmin) {
+      alert('Debes iniciar sesión para eliminar este producto.')
+      return
+    }
+
     const confirmar = window.confirm(`¿Seguro que querés eliminar ${producto.Nombre}?`)
     if (!confirmar) return
 
@@ -290,6 +322,13 @@ function DetalleProducto() {
 
   return (
     <div className="detalle-producto">
+
+      {guardando && (
+        <div className="guardando-producto" role="status" aria-live="polite">
+          <div className="guardando-producto__spinner" />
+          <p>Guardando cambios...</p>
+        </div>
+      )}
 
 
       <div className="detalle-producto-contenido">
@@ -473,8 +512,8 @@ function DetalleProducto() {
                 <option value="false">No</option>
               </select>
             ) : (
-              <p className="campo-valor">
-                {producto.enStock ? "Sí ✅" : "No ❌"}
+              <p className={`campo-valor ${producto.enStock ? '' : 'sin-stock'}`}>
+                {producto.enStock ? 'En stock' : 'Sin stock'}
               </p>
             )}
 
@@ -490,18 +529,21 @@ function DetalleProducto() {
 
                 <div className="imagen-editor">
 
-                  <input
-                    className="input-file"
-                    type="file"
-                    accept="image/*"
-                    onChange={manejarArchivo}
-                  />
+                  <label className="selector-imagen">
+                    Elegir imagen desde el dispositivo
+                    <input
+                      className="input-file"
+                      type="file"
+                      accept="image/*"
+                      onChange={manejarArchivo}
+                    />
+                  </label>
 
 
                   <input
                     className="campo-input"
                     placeholder="O pegá una URL"
-                    value={form.ImagenUrl || ''}
+                    value={form.ImagenUrl?.startsWith('data:') ? '' : form.ImagenUrl || ''}
                     onChange={(e) => {
                       setForm({
                         ...form,
@@ -588,13 +630,15 @@ function DetalleProducto() {
               <button
                 className="btn btn-primary"
                 onClick={guardarCambios}
+                disabled={guardando}
               >
-                Guardar
+                {guardando ? 'Guardando...' : 'Guardar'}
               </button>
 
               <button
                 className="btn btn-secondary"
                 onClick={cancelarEdicion}
+                disabled={guardando}
               >
                 Cancelar
               </button>
