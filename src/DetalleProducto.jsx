@@ -248,6 +248,14 @@ function DetalleProducto() {
       }
     }
 
+    // Los órdenes pueden tener huecos cuando se eliminó una foto. Usar la
+    // cantidad de fotos podría repetir un orden existente y la base rechaza
+    // el insert si ese orden debe ser único para el producto.
+    const ultimoOrden = fotos.reduce(
+      (mayor, foto) => Math.max(mayor, Number(foto.orden) || 0),
+      0
+    )
+
     for (let i = 0; i < fotosNuevas.length; i++) {
       const imagen = await convertirArchivoABase64(fotosNuevas[i].file)
       const { error: agregarError } = await supabase
@@ -255,7 +263,7 @@ function DetalleProducto() {
         .insert({
           idProducto: id,
           ImagenUrl: imagen,
-          orden: fotos.length + i + 1
+          orden: ultimoOrden + i + 1
         })
 
       if (agregarError) {
