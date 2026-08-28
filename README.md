@@ -23,3 +23,16 @@ If you are developing a production application, we recommend using TypeScript wi
 4. Run `supabase/security_policies.sql` in the Supabase SQL Editor.
 
 The current schema has no verified roles or administrator profile table. Therefore, the client and RLS policies treat every authenticated Supabase user as an administrator. Add a role table and change the policies before creating non-admin accounts.
+
+## Persistencia de sesión local
+
+La sesión se guarda en el almacenamiento local del navegador. Para conservarla durante el desarrollo, usá siempre `http://127.0.0.1:5173`; si ese puerto está ocupado, `npm run dev` se detendrá en lugar de iniciar en otro puerto y crear otro origen de navegador.
+
+## Despliegue en Vercel
+
+El archivo `.env` no se sube a GitHub y no debe subirse. En Vercel abrí el proyecto, entrá a **Settings > Environment Variables** y creá estas dos variables para los entornos **Production**, **Preview** y **Development**:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_KEY`
+
+Usá los mismos valores que en `.env`, guardá y hacé **Redeploy** del último deployment. Las variables que empiezan con `VITE_` se incorporan al build; por eso un redeploy es necesario después de agregarlas. La publishable key de Supabase está diseñada para usarse desde el navegador; no agregues una `service_role` aquí.
