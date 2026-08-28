@@ -222,12 +222,13 @@ function DetalleProducto() {
     )
 
     for (const idFoto of fotosAEliminar) {
-      const { error: eliminarError } = await supabase
+      const { data: fotosEliminadas, error: eliminarError } = await supabase
         .from('FotosProducto')
         .delete()
         .eq('idFoto', idFoto)
+        .select('idFoto')
 
-      if (eliminarError) {
+      if (eliminarError || fotosEliminadas?.length !== 1) {
         alert('El producto se guardó, pero no se pudo eliminar una foto.')
         console.error(eliminarError)
         return
