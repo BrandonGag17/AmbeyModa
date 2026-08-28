@@ -63,26 +63,34 @@ function DetalleProducto() {
 
     const p = data[0]
 
-    const { data: categoria } = await supabase
+    const productoInicial = {
+      ...p,
+      categoriaNombre: undefined
+    }
+
+    setProducto(productoInicial)
+    setForm(productoInicial)
+    setPreviewUrl(productoInicial.ImagenUrl || '')
+
+    const categoriaPromise = supabase
       .from('categorias')
       .select('nombre')
       .eq('idcategoria', p.idCategoria)
       .single()
 
-    const productoCompleto = {
-      ...p,
-      categoriaNombre: categoria?.nombre
-    }
-
-    setProducto(productoCompleto)
-    setForm(productoCompleto)
-    setPreviewUrl(productoCompleto.ImagenUrl || '')
-
-    const { data: fotosData, error: fotosError } = await supabase
+    const fotosPromise = supabase
       .from('FotosProducto')
       .select('idFoto, ImagenUrl, orden')
       .eq('idProducto', p.idProducto)
       .order('orden', { ascending: true })
+
+    const [{ data: categoria }, { data: fotosData, error: fotosError }] =
+      await Promise.all([categoriaPromise, fotosPromise])
+
+    setProducto((actual) => actual
+      ? { ...actual, categoriaNombre: categoria?.nombre }
+      : actual
+    )
 
     if (fotosError) {
       console.error(fotosError)

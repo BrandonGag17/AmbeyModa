@@ -168,6 +168,8 @@ function Inicio() {
                                     <img
                                         src={prod.ImagenUrl}
                                         alt={prod.Nombre}
+                                        loading="lazy"
+                                        decoding="async"
                                     />
                                 )}
                             </div>
