@@ -48,12 +48,22 @@ function Inicio() {
         setLoading(false)
     }
 
-    const productosFiltrados = useMemo(() => 
-        productos.filter((prod) =>
-            prod.Nombre.toLowerCase().includes(busqueda.toLowerCase())
-        ),
-        [productos, busqueda]
-    )
+    const productosFiltrados = useMemo(() => {
+        const productosOrdenados = [...productos].sort((productoA, productoB) => {
+            const numeroA = productoA.Nombre.match(/#Mod(\d+)/i)?.[1]
+            const numeroB = productoB.Nombre.match(/#Mod(\d+)/i)?.[1]
+
+            if (numeroA === undefined && numeroB === undefined) return 0
+            if (numeroA === undefined) return 1
+            if (numeroB === undefined) return -1
+
+            return Number(numeroA) - Number(numeroB)
+        })
+
+        return productosOrdenados.filter((producto) =>
+            producto.Nombre.toLowerCase().includes(busqueda.toLowerCase())
+        )
+    }, [productos, busqueda])
 
     function crearProducto() {
         if (!esAdmin) {
