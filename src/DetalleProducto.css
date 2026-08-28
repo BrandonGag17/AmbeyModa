@@ -175,6 +175,7 @@ input[type="file"] {
 @media (max-width: 700px) {
 
     .detalle-producto {
+        width: calc(100% - 40px);
         margin: 20px;
         padding: 25px;
     }
