@@ -20,6 +20,10 @@ function EditarCategoria() {
 
     const [productoSeleccionado, setProductoSeleccionado] = useState(null)
     const [nuevaCategoria, setNuevaCategoria] = useState('')
+    const [mostrarConfirmacionEliminar, setMostrarConfirmacionEliminar] = useState(false)
+    const [mostrarNuevaCategoriaReemplazo, setMostrarNuevaCategoriaReemplazo] = useState(false)
+    const [nombreCategoriaReemplazo, setNombreCategoriaReemplazo] = useState('')
+    const [eliminandoCategoria, setEliminandoCategoria] = useState(false)
 
     const cargarDatos = useCallback(async () => {
 
@@ -157,6 +161,128 @@ function EditarCategoria() {
         setNuevaCategoria('')
     }
 
+    function iniciarEliminacionCategoria() {
+        if (!esAdmin || eliminandoCategoria) return
+
+        if (productos.length === 0) {
+            eliminarCategoria()
+            return
+        }
+
+        setMostrarConfirmacionEliminar(true)
+    }
+
+    async function eliminarProductosDeCategoria() {
+        const idsProductos = productos.map((producto) => producto.idProducto)
+
+        if (idsProductos.length === 0) return true
+
+        // Se eliminan primero las fotos para soportar bases de datos sin
+        // eliminación en cascada configurada en FotosProducto.
+        const { error: errorFotos } = await supabase
+            .from('FotosProducto')
+            .delete()
+            .in('idProducto', idsProductos)
+
+        if (errorFotos) {
+            console.error('Error eliminando fotos de productos:', errorFotos)
+            alert('No se pudieron eliminar las fotos de los productos.')
+            return false
+        }
+
+        const { error: errorProductos } = await supabase
+            .from('Productos')
+            .delete()
+            .eq('idCategoria', Number(id))
+
+        if (errorProductos) {
+            console.error('Error eliminando productos:', errorProductos)
+            alert('No se pudieron eliminar los productos de la categoría.')
+            return false
+        }
+
+        return true
+    }
+
+    async function eliminarCategoria({ eliminarProductos = false } = {}) {
+        if (!esAdmin || eliminandoCategoria) return
+
+        setEliminandoCategoria(true)
+
+        if (eliminarProductos) {
+            const productosEliminados = await eliminarProductosDeCategoria()
+            if (!productosEliminados) {
+                setEliminandoCategoria(false)
+                return
+            }
+        }
+
+        const { error } = await supabase
+            .from('categorias')
+            .delete()
+            .eq('idcategoria', Number(id))
+
+        if (error) {
+            console.error('Error eliminando categoría:', error)
+            alert('No se pudo eliminar la categoría.')
+            setEliminandoCategoria(false)
+            return
+        }
+
+        navigate('/')
+    }
+
+    async function crearCategoriaYReasignarProductos() {
+        if (!esAdmin || eliminandoCategoria) return
+
+        const nombreNueva = nombreCategoriaReemplazo.trim()
+        if (!nombreNueva) {
+            alert('Escribí un nombre para la nueva categoría.')
+            return
+        }
+
+        setEliminandoCategoria(true)
+
+        const { data: categoriaNueva, error: errorCreacion } = await supabase
+            .from('categorias')
+            .insert({ nombre: nombreNueva })
+            .select('idcategoria, nombre')
+            .single()
+
+        if (errorCreacion || !categoriaNueva) {
+            console.error('Error creando categoría de reemplazo:', errorCreacion)
+            alert('No se pudo crear la nueva categoría.')
+            setEliminandoCategoria(false)
+            return
+        }
+
+        const { error: errorMovimiento } = await supabase
+            .from('Productos')
+            .update({ idCategoria: categoriaNueva.idcategoria })
+            .eq('idCategoria', Number(id))
+
+        if (errorMovimiento) {
+            console.error('Error reasignando productos:', errorMovimiento)
+            alert('La nueva categoría fue creada, pero no se pudieron mover los productos. La categoría original no fue eliminada.')
+            setEliminandoCategoria(false)
+            return
+        }
+
+        const { error: errorEliminacion } = await supabase
+            .from('categorias')
+            .delete()
+            .eq('idcategoria', Number(id))
+
+        if (errorEliminacion) {
+            console.error('Error eliminando categoría original:', errorEliminacion)
+            alert('Los productos fueron movidos, pero no se pudo eliminar la categoría original.')
+            setEliminandoCategoria(false)
+            return
+        }
+
+        navigate('/')
+    }
+
     if (loading) {
         return (
             <div className="loading-state">
@@ -207,6 +333,14 @@ function EditarCategoria() {
                         {guardandoNombre
                             ? 'Guardando...'
                             : 'Guardar nombre'}
+                    </button>
+
+                    <button
+                        className="btn btn-danger"
+                        onClick={iniciarEliminacionCategoria}
+                        disabled={eliminandoCategoria}
+                    >
+                        {eliminandoCategoria ? 'Eliminando...' : 'Eliminar categoría'}
                     </button>
 
                 </div>
@@ -347,6 +481,107 @@ function EditarCategoria() {
                                 onClick={moverProducto}
                             >
                                 Mover producto
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
+            {mostrarConfirmacionEliminar && (
+
+                <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="eliminar-categoria-titulo">
+
+                    <div className="modal">
+
+                        <h2 id="eliminar-categoria-titulo">Eliminar categoría</h2>
+
+                        <p>
+                            La categoría que querés eliminar tiene productos, ¿deseás crear una nueva categoría en su lugar?
+                        </p>
+
+                        <p className="modal-advertencia">
+                            Si no creás una nueva categoría, los productos que se encuentran en la categoría actual también van a ser eliminados.
+                        </p>
+
+                        <div className="modal-acciones">
+
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => {
+                                    setMostrarConfirmacionEliminar(false)
+                                    setNombreCategoriaReemplazo('')
+                                    setMostrarNuevaCategoriaReemplazo(true)
+                                }}
+                            >
+                                Sí
+                            </button>
+
+                            <button
+                                className="btn btn-danger"
+                                onClick={() => {
+                                    setMostrarConfirmacionEliminar(false)
+                                    eliminarCategoria({ eliminarProductos: true })
+                                }}
+                            >
+                                No, eliminar todo
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
+            {mostrarNuevaCategoriaReemplazo && (
+
+                <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="nueva-categoria-titulo">
+
+                    <div className="modal">
+
+                        <h2 id="nueva-categoria-titulo">Crear nueva categoría</h2>
+
+                        <p>
+                            Los {productos.length} producto{productos.length === 1 ? '' : 's'} de <strong>{categoria.nombre}</strong> se moverán automáticamente a esta nueva categoría.
+                        </p>
+
+                        <label className="campo-label" htmlFor="nombre-categoria-reemplazo">
+                            Nombre de la nueva categoría
+                        </label>
+
+                        <input
+                            id="nombre-categoria-reemplazo"
+                            className="campo-input"
+                            value={nombreCategoriaReemplazo}
+                            onChange={(e) => setNombreCategoriaReemplazo(e.target.value)}
+                            placeholder="Ej. Camperas"
+                            autoFocus
+                        />
+
+                        <div className="modal-acciones">
+
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => {
+                                    setMostrarNuevaCategoriaReemplazo(false)
+                                    setNombreCategoriaReemplazo('')
+                                }}
+                                disabled={eliminandoCategoria}
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                className="btn btn-primary"
+                                onClick={crearCategoriaYReasignarProductos}
+                                disabled={eliminandoCategoria}
+                            >
+                                {eliminandoCategoria ? 'Guardando...' : 'Crear, mover y eliminar'}
                             </button>
 
                         </div>

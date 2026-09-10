@@ -60,6 +60,30 @@
     transform: translateY(-2px);
 }
 
+.btn-danger {
+    height: 48px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 12px;
+    background: #b42318;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .20s;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #7a271a;
+    transform: translateY(-2px);
+}
+
+.btn-danger:disabled,
+.btn-primary:disabled {
+    cursor: not-allowed;
+    opacity: .65;
+    transform: none;
+}
+
 .btn-eliminar-categoria {
     display: inline-block;
     margin-top: 12px;
@@ -104,6 +128,14 @@
 .modal p {
     color: #333;
     margin-bottom: 14px;
+}
+
+.modal-advertencia {
+    padding: 12px;
+    border-left: 4px solid #b42318;
+    border-radius: 6px;
+    background: #fff3f2;
+    color: #7a271a !important;
 }
 
 .modal .campo-input {
